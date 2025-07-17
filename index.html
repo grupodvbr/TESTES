@@ -2,199 +2,244 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Painel de Reservas - Calendário</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <title>Reserva de Mesa</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f0f2f5;
-      margin: 0;
-      padding: 0;
+      padding: 40px;
     }
-    header {
+
+    form {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 12px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+      box-sizing: border-box;
+    }
+
+    .data-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .add-btn, .remove-btn {
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-btn {
+      background: #eee;
+    }
+
+    .add-btn:hover {
+      background: #ddd;
+    }
+
+    .remove-btn {
+      background-color: #ffeaea;
+      color: red;
+    }
+
+    .remove-btn:hover {
+      background: #ffcccc;
+    }
+
+    button[type="submit"] {
+      margin-top: 30px;
+      padding: 14px;
       background-color: #2196F3;
       color: white;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    #calendar {
-      max-width: 1000px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .fc-event-title { font-weight: bold; }
-    #popup {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    #popup-content {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      text-align: center;
-    }
-    .btn {
-      padding: 10px 20px;
-      margin: 10px 5px;
       border: none;
-      border-radius: 5px;
-      font-weight: bold;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 16px;
       cursor: pointer;
+      transition: background 0.3s;
     }
-    .btn-editar { background-color: #1976D2; color: white; }
-    .btn-concluir { background-color: #4CAF50; color: white; }
-    .btn-fechar { background-color: #ccc; color: black; }
-    .btn-adicionar { background-color: #FF9800; color: white; }
-    .resumo-bloco {
-      max-width: 900px;
-      margin: 20px auto;
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+    button[type="submit"]:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
     }
-    .resumo-bloco h3 {
-      margin-top: 0;
-      font-size: 18px;
+
+    button[type="submit"]:hover:not([disabled]) {
+      background-color: #1976D2;
     }
-    .resumo-bloco ul { list-style: none; padding: 0; }
-    .resumo-bloco li { margin-bottom: 5px; }
   </style>
 </head>
 <body>
 
-<header>📅 Painel de Reservas</header>
-<div id="calendar"></div>
+  <form id="reserva-form">
+    <h2>Reserva de Mesa</h2>
 
-<!-- Modal -->
-<div id="popup">
-  <div id="popup-content">
-    <h3 id="popup-titulo"></h3>
-    <p id="popup-detalhes"></p>
-    <div id="historico-pagamentos" style="text-align:left; font-size:14px; margin-top:10px;"></div>
-    <div id="popup-botoes">
-      <button class="btn btn-editar" id="btn-editar">✏️ Editar</button>
-      <button class="btn btn-concluir" id="btn-concluir">✅ Concluir</button>
-      <button class="btn btn-adicionar" id="btn-adicionar">➕ Adicionar Pagamento</button>
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome" required>
+
+    <label for="email">E-mail:</label>
+    <input type="email" id="email" name="email" placeholder="exemplo@email.com">
+
+    <label for="telefone">Telefone:</label>
+    <input type="tel" id="telefone" name="telefone" inputmode="numeric" placeholder="(00) 00000-0000">
+
+    <label for="pessoas">Número de Pessoas:</label>
+    <input type="number" id="pessoas" name="pessoas" min="1" inputmode="numeric">
+
+    <label for="mesa">Mesa:</label>
+    <input type="text" id="mesa" name="mesa">
+
+    <label>Data(s) e Hora(s) da Reserva:</label>
+    <div id="datas-container">
+      <div class="data-wrapper">
+        <input type="datetime-local" name="datahora" class="datahora" required>
+      </div>
     </div>
-    <button class="btn btn-fechar" onclick="document.getElementById('popup').style.display='none'">Fechar</button>
-  </div>
-</div>
+    <button type="button" class="add-btn" onclick="adicionarData()">+</button>
 
-<!-- Resumo do Dia -->
-<div class="resumo-bloco">
-  <h3>📅 Reservas do Dia</h3>
-  <ul id="lista-dia"></ul>
-  <hr>
-  <p><b>Valor Total:</b> <span id="total-dia">R$ 0,00</span></p>
-  <p><b>Valor Antecipado:</b> <span id="antecipado-dia">R$ 0,00</span></p>
-  <p><b>A receber:</b> <span id="saldo-dia">R$ 0,00</span></p>
-</div>
+    <label for="valorEstimado">Valor Estimado (R$):</label>
+    <input type="text" id="valorEstimado" name="valorEstimado" inputmode="decimal" placeholder="0,00">
 
-<!-- Resumo do Mês -->
-<div class="resumo-bloco">
-  <h3>📊 Resumo por Mês</h3>
-  <ul id="resumo-mensal"></ul>
-</div>
+    <label for="pagamentoAntecipado">Pagamento Antecipado (R$):</label>
+    <input type="text" id="pagamentoAntecipado" name="pagamentoAntecipado" inputmode="decimal" placeholder="0,00">
 
-<script>
-let reservaAtual = null;
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwD0rhYbRP0QK-AmgHMoLGMez3g5xTypLvsL3-qssM6qxtXbHSdWtaHqINbMO5zFk6E/exec";
+    <label for="banco">Banco:</label>
+    <select id="banco" name="banco" required>
+      <option value="" disabled selected>Selecione o banco</option>
+      <option value="Banco do Brasil">Banco do Brasil</option>
+      <option value="Caixa Econômica">Caixa Econômica</option>
+      <option value="Bradesco">Bradesco</option>
+      <option value="Itaú">Itaú</option>
+      <option value="Santander">Santander</option>
+      <option value="Nubank">Nubank</option>
+      <option value="Inter">Inter</option>
+      <option value="PicPay">PicPay</option>
+      <option value="C6 Bank">C6 Bank</option>
+      <option value="Outro">Outro</option>
+    </select>
 
-function formatarMoeda(valor) {
-  return Number(valor).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+    <button type="submit" id="btnEnviar">Enviar Reserva</button>
+  </form>
 
-function formatarHora(data) {
-  const d = new Date(data);
-  return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-}
+  <script>
+    const form = document.getElementById('reserva-form');
+    const btn = document.getElementById('btnEnviar');
+    const container = document.getElementById('datas-container');
 
-async function abrirPopup(p) {
-  reservaAtual = p;
-  document.getElementById('popup-titulo').innerText = `Reserva de ${p.nome}`;
-  document.getElementById('popup-detalhes').innerHTML = `
-    <b>Mesa:</b> ${p.mesa}<br>
-    <b>Pessoas:</b> ${p.pessoas}<br>
-    <b>Banco:</b> ${p.banco}<br>
-    <b>Valor:</b> R$ ${p.valorEstimado}<br>
-    <b>Antecipado:</b> R$ ${p.pagamentoAntecipado}<br>
-    <b>Status:</b> ${p.status}<br>
-    ${p.valorFinal ? `<b>Valor Final:</b> R$ ${p.valorFinal}<br>` : ""}
-  `;
+    function adicionarData() {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'data-wrapper';
 
-  const botoes = document.getElementById("popup-botoes");
-  botoes.style.display = p.status === "Concluída" ? "none" : "block";
+      const novoCampo = document.createElement('input');
+      novoCampo.type = 'datetime-local';
+      novoCampo.name = 'datahora';
+      novoCampo.className = 'datahora';
+      novoCampo.required = true;
 
-  const historicoDiv = document.getElementById("historico-pagamentos");
-  historicoDiv.innerHTML = "<i>Carregando pagamentos...</i>";
+      const btnRemover = document.createElement('button');
+      btnRemover.innerHTML = '🗑';
+      btnRemover.type = 'button';
+      btnRemover.className = 'remove-btn';
+      btnRemover.onclick = () => container.removeChild(wrapper);
 
-  if (!p.nome) {
-    historicoDiv.innerHTML = "<span style='color:red'>Nome não disponível para buscar pagamentos.</span>";
-    return;
-  }
-
-  try {
-    const res = await fetch(`${SCRIPT_URL}?nome=${encodeURIComponent(p.nome)}`);
-    const pagamentos = await res.json();
-
-    if (!Array.isArray(pagamentos) || pagamentos.length === 0) {
-      historicoDiv.innerHTML = "<i>Nenhum pagamento adicional registrado.</i>";
-    } else {
-      historicoDiv.innerHTML = `
-        <h4>💰 Pagamentos Antecipados</h4>
-        <ul style="list-style:none;padding:0;text-align:left">
-          ${pagamentos.map(pg => `
-            <li>📅 ${pg.data} - 💵 R$ ${parseFloat(pg.valor).toFixed(2)} - 🏦 ${pg.banco}</li>
-          `).join('')}
-        </ul>
-      `;
+      wrapper.appendChild(novoCampo);
+      wrapper.appendChild(btnRemover);
+      container.appendChild(wrapper);
     }
-  } catch (e) {
-    historicoDiv.innerHTML = "<span style='color:red'>Erro ao carregar pagamentos.</span>";
-  }
 
-  document.getElementById('popup').style.display = 'flex';
-}
+    function formatarMoeda(input) {
+      let valor = input.value.replace(/\D/g, "");
+      valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
+      valor = valor.replace(".", ",");
+      valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      input.value = valor;
+    }
 
-document.getElementById("btn-adicionar").onclick = async function () {
-  const valor = prompt("Valor do pagamento antecipado:");
-  if (!valor) return;
-  const banco = prompt("Banco:");
-  if (!banco) return;
-  const data = prompt("Data do recebimento (DD/MM/AAAA):", new Date().toLocaleDateString("pt-BR"));
-  if (!data) return;
+    document.getElementById('valorEstimado').addEventListener('input', function () {
+      formatarMoeda(this);
+    });
 
-  await fetch(SCRIPT_URL, {
-    method: "POST",
-    body: JSON.stringify({
-      acao: "adicionarPagamento",
-      nome: reservaAtual.nome,
-      valorExtra: valor,
-      banco: banco,
-      dataRecebimento: data
-    })
-  });
+    document.getElementById('pagamentoAntecipado').addEventListener('input', function () {
+      formatarMoeda(this);
+    });
 
-  alert("Pagamento registrado com sucesso!");
-  abrirPopup(reservaAtual);
-};
-</script>
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+
+      const datas = Array.from(document.querySelectorAll('.datahora')).map(input => input.value);
+
+      const valorEstimado = form.valorEstimado.value.replace(/\./g, "").replace(",", ".");
+      const pagamentoAntecipado = form.pagamentoAntecipado.value.replace(/\./g, "").replace(",", ".");
+
+      const dados = {
+        nome: form.nome.value,
+        email: form.email.value,
+        telefone: form.telefone.value,
+        pessoas: form.pessoas.value,
+        mesa: form.mesa.value,
+        datahora: datas,
+        valorEstimado: valorEstimado,
+        pagamentoAntecipado: pagamentoAntecipado,
+        banco: form.banco.value
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbyzeYqtWTsFfzKOmizG4fSWwgEFfRNKkvm7o7PwM_8FFuApWZhHWAJYfNLL5AQdnb7r/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      })
+      .then(response => response.ok ? response.text() : Promise.reject("Erro no envio"))
+      .then(() => {
+        alert("Reserva enviada com sucesso!");
+        form.reset();
+        container.innerHTML = `<div class="data-wrapper"><input type="datetime-local" name="datahora" class="datahora" required></div>`;
+      })
+      .catch(err => {
+        alert("Erro ao enviar reserva. Verifique sua conexão.");
+        console.error(err);
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.textContent = "Enviar Reserva";
+      });
+    });
+  </script>
 
 </body>
 </html>
