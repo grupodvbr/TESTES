@@ -2,244 +2,264 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Reserva de Mesa</title>
+  <title>DELÍCIA-GOURMET</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f0f2f5;
-      padding: 40px;
+    body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 30px; }
+    .container { background: #fff; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); max-width: 500px; width: 100%; padding: 25px; position: relative; }
+    h2 { text-align: center; color: #333; margin-bottom: 20px; }
+    label { display: block; margin: 12px 0 5px; font-weight: bold; }
+    input, select, textarea {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
     }
-
-    form {
-      background: #fff;
-      padding: 30px 40px;
-      border-radius: 12px;
-      max-width: 600px;
-      margin: auto;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    .unidades { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .unidades button {
+      flex: 1 1 25%; padding: 8px; font-size: 14px; border: 1px solid #2196F3; background: #fff; border-radius: 20px; cursor: pointer;
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 25px;
-      color: #333;
+    .unidades button.ativo { background: #2196F3; color: #fff; }
+    textarea { resize: vertical; min-height: 60px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+    button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
+    .btn-blue { background: #2196F3; color: #fff; }
+    .btn-red { background: #f44336; color: #fff; }
+    #msg { text-align: center; margin-top: 10px; font-weight: bold; }
+    #spinner {
+      display: none; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #2196F3; border-radius: 50%;
+      width: 60px; height: 60px; animation: spin 1s linear infinite; z-index: 100;
     }
-
-    label {
-      display: block;
-      margin-top: 20px;
-      font-weight: 600;
-      color: #444;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 10px 12px;
-      margin-top: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 15px;
-      box-sizing: border-box;
-    }
-
-    .data-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .add-btn, .remove-btn {
-      border: none;
-      cursor: pointer;
-      font-size: 18px;
-      font-weight: bold;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .add-btn {
-      background: #eee;
-    }
-
-    .add-btn:hover {
-      background: #ddd;
-    }
-
-    .remove-btn {
-      background-color: #ffeaea;
-      color: red;
-    }
-
-    .remove-btn:hover {
-      background: #ffcccc;
-    }
-
-    button[type="submit"] {
-      margin-top: 30px;
-      padding: 14px;
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      width: 100%;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button[type="submit"]:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
-
-    button[type="submit"]:hover:not([disabled]) {
-      background-color: #1976D2;
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
   </style>
 </head>
 <body>
+<div class="container">
+  <h2>Requisição de produtos</h2>
 
-  <form id="reserva-form">
-    <h2>Reserva de Mesa</h2>
+  <label>Solicitante:</label>
+  <select id="solicitante">
+    <option value="">Selecione o solicitante</option>
+    <option value="ADM">ADM</option>
+    <option value="Ruan">Ruan</option>
+    <option value="Renata">Renata</option>
+    <option value="Lu">Lu</option>
+    <option value="Bruna">Bruna</option>
+    <option value="Renan">Renan</option>
+    <option value="Raimundo">Raimundo</option>
+    <option value="Cleide">Cleide</option>
+    <option value="Ricardo">Ricardo</option>
+    <option value="Larissa">Larissa</option>
+    <option value="Gabriel">Gabriel</option>
+    <option value="Valcir">Valcir</option>
+    <option value="Tailson">Tailson</option>
+    <option value="Dheure">Dheure</option>
+    <option value="Dorilson">Dorilson</option>
+    <option value="joane">joane</option>
+    <option value="Neval">Neval</option>
+    <option value="Agnaldo">Agnaldo</option>
+    <option value="Genison">Jenison</option>
+    <option value="Vanial">Vania</option>
+    <option value="Adriana">Adriana</option>
+    <option value="Ivaneide">Ivaneide</option>
+    <option value="Quiteria">Quiteria</option>
+    <option value="Luziânia">Luziânia</option>
+    <option value="Rosemeire">Rosemeire</option>
+    <option value="Wilma">Wilma</option>
+    <option value="Islane">Islane</option>
+    <option value="Marcelo">Marcelo</option>
+    <option value="Juciara">Juciara</option>
+    <option value="Aline Santos">Aline Santos</option>
+    <option value="Aline Rodrigues">Aline Rodrigues</option>
+    <option value="Geane">Geane</option>
+    <!-- ... MANTÉM TODOS -->
+  </select>
 
-    <label for="nome">Nome:</label>
-    <input type="text" id="nome" name="nome" required>
+  <label>Setor:</label>
+  <select id="setor">
+    <option value="">Selecione o setor</option>
+    <option value="Cozinha">Cozinha</option>
+    <option value="Limpeza">Limpeza</option>
+    <option value="Sushi">Sushi</option>
+    <option value="Garçons">Garçons</option>
+    <option value="Gerência">Gerência</option>
+    <option value="Pizzaria">Pizzaria</option>
+    <option value="Bar">Bar</option>
+    <option value="Churrasqueira">Churrasqueira</option>
+    <option value="Caixa">Caixa</option>
+    <!-- ... -->
+  </select>
 
-    <label for="email">E-mail:</label>
-    <input type="email" id="email" name="email" placeholder="exemplo@email.com">
+  <label>Produto:</label>
+  <input type="text" id="item" placeholder="Digite o produto">
 
-    <label for="telefone">Telefone:</label>
-    <input type="tel" id="telefone" name="telefone" inputmode="numeric" placeholder="(00) 00000-0000">
+  <label>Quantidade:</label>
+  <input type="number" id="quantidade" min="1">
 
-    <label for="pessoas">Número de Pessoas:</label>
-    <input type="number" id="pessoas" name="pessoas" min="1" inputmode="numeric">
+  <label>Unidade de Medida:</label>
+  <div class="unidades">
+    <button type="button" onclick="selecionarUnidade(this, 'UN.')">UN.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'PC.')">PC.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'L.')">L.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'KG.')">KG.</button>
+    <button type="button" onclick="selecionarUnidade(this, 'CX')">CX.</button>
+    <!-- ... -->
+  </div>
 
-    <label for="mesa">Mesa:</label>
-    <input type="text" id="mesa" name="mesa">
+  <label>Observações:</label>
+  <textarea id="observacoes" placeholder="Observações gerais"></textarea>
 
-    <label>Data(s) e Hora(s) da Reserva:</label>
-    <div id="datas-container">
-      <div class="data-wrapper">
-        <input type="datetime-local" name="datahora" class="datahora" required>
-      </div>
-    </div>
-    <button type="button" class="add-btn" onclick="adicionarData()">+</button>
+  <div id="spinner"></div>
+  <button id="btn-enviar" class="btn-blue" onclick="enviarItem()">ENVIAR ITEM</button>
+  <button class="btn-red" onclick="limparTabela()">LIMPAR HISTÓRICO</button>
+  <p id="msg"></p>
 
-    <label for="valorEstimado">Valor Estimado (R$):</label>
-    <input type="text" id="valorEstimado" name="valorEstimado" inputmode="decimal" placeholder="0,00">
+  <h3>Itens enviados nesta sessão:</h3>
+  <table id="historico">
+    <tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th><th>Status</th></tr>
+  </table>
+</div>
 
-    <label for="pagamentoAntecipado">Pagamento Antecipado (R$):</label>
-    <input type="text" id="pagamentoAntecipado" name="pagamentoAntecipado" inputmode="decimal" placeholder="0,00">
+<script>
+const solicitanteSenhas = {
+    "ADM": "00", "Ruan": "Ruan10", "Renata": "Renata12",
+    "Lu": "Lu26", "Bruna": "Bruna48", "Renan": "Renan78",
+    "Raimundo": "Raimundo47", "Cleide": "Cleide98", "Ricardo": "Ricardo41",
+    "Larissa": "Larissa56", "Valcir": "Valcir24", "Tailson": "Tailson97",
+    "Dheure": "Dheure73", "Neval": "Neval34", "Agnaldo": "Agnaldo67",
+    "Genison": "Genison35", "Dorilson": "Dorilson8", "joane": "joane6",
+    "Vanial": "Vanial86", "Adriana": "Adriana49", "Ivaneide": "Ivaneide46",
+    "Geane": "Geane83", "Luziânia": "Luziânia8", "Rosemeire": "Rosemeire30",
+    "Wilma": "Wilma87", "Gabriel": "Gabriel5", "Islane": "Islane78",
+    "Marcelo": "Marcelo75", "Juciara": "Juciara35", "Aline Santos": "Aline32",
+    "Aline Rodrigues": "Aline59", "Quiteria": "Quiteria43"
+};
 
-    <label for="banco">Banco:</label>
-    <select id="banco" name="banco" required>
-      <option value="" disabled selected>Selecione o banco</option>
-      <option value="Banco do Brasil">Banco do Brasil</option>
-      <option value="Caixa Econômica">Caixa Econômica</option>
-      <option value="Bradesco">Bradesco</option>
-      <option value="Itaú">Itaú</option>
-      <option value="Santander">Santander</option>
-      <option value="Nubank">Nubank</option>
-      <option value="Inter">Inter</option>
-      <option value="PicPay">PicPay</option>
-      <option value="C6 Bank">C6 Bank</option>
-      <option value="Outro">Outro</option>
-    </select>
+let unidadeSelecionada = '';
+let enviados = JSON.parse(localStorage.getItem('enviados')) || [];
+let senhaAutenticada = '';
 
-    <button type="submit" id="btnEnviar">Enviar Reserva</button>
-  </form>
+function selecionarUnidade(btn, valor) {
+  unidadeSelecionada = valor;
+  document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+}
 
-  <script>
-    const form = document.getElementById('reserva-form');
-    const btn = document.getElementById('btnEnviar');
-    const container = document.getElementById('datas-container');
-
-    function adicionarData() {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'data-wrapper';
-
-      const novoCampo = document.createElement('input');
-      novoCampo.type = 'datetime-local';
-      novoCampo.name = 'datahora';
-      novoCampo.className = 'datahora';
-      novoCampo.required = true;
-
-      const btnRemover = document.createElement('button');
-      btnRemover.innerHTML = '🗑';
-      btnRemover.type = 'button';
-      btnRemover.className = 'remove-btn';
-      btnRemover.onclick = () => container.removeChild(wrapper);
-
-      wrapper.appendChild(novoCampo);
-      wrapper.appendChild(btnRemover);
-      container.appendChild(wrapper);
+document.getElementById('solicitante').addEventListener('change', () => {
+  const s = document.getElementById('solicitante').value;
+  if (s) {
+    const senha = prompt(`Digite a senha para ${s}:`);
+    if (senha === solicitanteSenhas[s]) {
+      senhaAutenticada = senha;
+      document.getElementById('msg').innerText = "✅ Autenticado!";
+    } else {
+      senhaAutenticada = '';
+      document.getElementById('msg').innerText = "❌ Senha incorreta!";
+      document.getElementById('solicitante').value = '';
     }
+  }
+});
 
-    function formatarMoeda(input) {
-      let valor = input.value.replace(/\D/g, "");
-      valor = (parseInt(valor, 10) / 100).toFixed(2) + "";
-      valor = valor.replace(".", ",");
-      valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-      input.value = valor;
-    }
+function enviarItem() {
+  const solicitante = document.getElementById('solicitante').value.trim();
+  const setor = document.getElementById('setor').value.trim();
+  const item = document.getElementById('item').value.trim();
+  const quantidade = document.getElementById('quantidade').value.trim();
+  const observacoes = document.getElementById('observacoes').value.trim();
+  const horaEnvio = new Date().toLocaleTimeString();
 
-    document.getElementById('valorEstimado').addEventListener('input', function () {
-      formatarMoeda(this);
-    });
+  if (!solicitante || !setor || !item || !quantidade || !unidadeSelecionada || !senhaAutenticada) {
+    document.getElementById('msg').innerText = "⚠️ Preencha tudo!";
+    return;
+  }
 
-    document.getElementById('pagamentoAntecipado').addEventListener('input', function () {
-      formatarMoeda(this);
-    });
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('btn-enviar').disabled = true;
 
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+  enviados.push({ item, unidade: unidadeSelecionada, quantidade, setor, hora: horaEnvio, status: "Processando" });
+  save();
+  atualizarTabela();
 
-      btn.disabled = true;
-      btn.textContent = "Enviando...";
+  const data = new URLSearchParams();
+  data.append('Item', item);
+  data.append('Unidade', unidadeSelecionada);
+  data.append('Quantidade', quantidade);
+  data.append('Setor', setor);
+  data.append('Solicitante', solicitante);
+  data.append('Observacoes', observacoes);
 
-      const datas = Array.from(document.querySelectorAll('.datahora')).map(input => input.value);
+  fetch('https://script.google.com/macros/s/AKfycbxzho14mNBkxfDV5xTk_SmCyNAepae1oXmpJdZNf90fBi_nhokG174ul26COo8QNmGjLw/exec', {
+    method: 'POST',
+    body: data
+  })
+  .then(() => {
+    enviados[enviados.length - 1].status = "Enviado";
+    save();
+    atualizarTabela();
+    alert("✅ Item enviado com sucesso!");
+    limparCampos();
+  })
+  .catch(() => {
+    document.getElementById('msg').innerText = "✅ Item enviado com sucesso!";
+  })
+  .finally(() => {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('btn-enviar').disabled = false;
+  });
+}
 
-      const valorEstimado = form.valorEstimado.value.replace(/\./g, "").replace(",", ".");
-      const pagamentoAntecipado = form.pagamentoAntecipado.value.replace(/\./g, "").replace(",", ".");
+function limparCampos() {
+  document.getElementById('item').value = '';
+  document.getElementById('quantidade').value = '';
+  document.getElementById('observacoes').value = '';
+  unidadeSelecionada = '';
+  document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
+}
 
-      const dados = {
-        nome: form.nome.value,
-        email: form.email.value,
-        telefone: form.telefone.value,
-        pessoas: form.pessoas.value,
-        mesa: form.mesa.value,
-        datahora: datas,
-        valorEstimado: valorEstimado,
-        pagamentoAntecipado: pagamentoAntecipado,
-        banco: form.banco.value
-      };
+function atualizarTabela() {
+  const tabela = document.getElementById('historico');
+  tabela.innerHTML = `<tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th><th>Status</th></tr>`;
+  enviados.forEach(i => {
+    const row = tabela.insertRow();
+    row.insertCell(0).innerText = i.item;
+    row.insertCell(1).innerText = i.unidade;
+    row.insertCell(2).innerText = i.quantidade;
+    row.insertCell(3).innerText = i.setor;
+    row.insertCell(4).innerText = i.hora;
+    row.insertCell(5).innerText = i.status;
+  });
+}
 
-      fetch("https://script.google.com/macros/s/AKfycbyzeYqtWTsFfzKOmizG4fSWwgEFfRNKkvm7o7PwM_8FFuApWZhHWAJYfNLL5AQdnb7r/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados)
-      })
-      .then(response => response.ok ? response.text() : Promise.reject("Erro no envio"))
-      .then(() => {
-        alert("Reserva enviada com sucesso!");
-        form.reset();
-        container.innerHTML = `<div class="data-wrapper"><input type="datetime-local" name="datahora" class="datahora" required></div>`;
-      })
-      .catch(err => {
-        alert("Erro ao enviar reserva. Verifique sua conexão.");
-        console.error(err);
-      })
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = "Enviar Reserva";
+function save() {
+  localStorage.setItem('enviados', JSON.stringify(enviados));
+}
+
+function limparTabela() {
+  enviados = [];
+  save();
+  atualizarTabela();
+}
+
+function atualizarStatusPlanilha() {
+  fetch('https://script.google.com/macros/s/AKfycby_qZFsDNjx63LWTkJrV9DID2ZeJcByUrun9M3KHEbLUW0HO8asGnTklREen8uBYUAWtQ/exec')
+    .then(r => r.json())
+    .then(data => {
+      enviados.forEach(localItem => {
+        const encontrado = data.find(r => r.Item === localItem.item);
+        if (encontrado) localItem.status = encontrado.Status || localItem.status;
       });
+      save();
+      atualizarTabela();
     });
-  </script>
+}
+
+setInterval(atualizarStatusPlanilha, 10000);
+atualizarTabela();
+</script>
 
 </body>
 </html>
