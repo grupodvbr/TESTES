@@ -1,265 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>DELÍCIA-GOURMET</title>
+  <meta charset="UTF-8" />
+  <title>Pesquisa de Satisfação</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 30px; }
-    .container { background: #fff; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); max-width: 500px; width: 100%; padding: 25px; position: relative; }
-    h2 { text-align: center; color: #333; margin-bottom: 20px; }
-    label { display: block; margin: 12px 0 5px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f8f8;
+      padding: 20px;
+    }
+    form {
+      background: #fff;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 15px;
+    }
     input, select, textarea {
-      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
-    .unidades { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-    .unidades button {
-      flex: 1 1 25%; padding: 8px; font-size: 14px; border: 1px solid #2196F3; background: #fff; border-radius: 20px; cursor: pointer;
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background: #28a745;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
     }
-    .unidades button.ativo { background: #2196F3; color: #fff; }
-    textarea { resize: vertical; min-height: 60px; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    button { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; }
-    .btn-blue { background: #2196F3; color: #fff; }
-    .btn-red { background: #f44336; color: #fff; }
-    #msg { text-align: center; margin-top: 10px; font-weight: bold; }
-    #spinner {
-      display: none; position: absolute; top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #2196F3; border-radius: 50%;
-      width: 60px; height: 60px; animation: spin 1s linear infinite; z-index: 100;
-    }
-    @keyframes spin {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    .success {
+      color: green;
+      text-align: center;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h2>Requisição de produtos</h2>
+  <form id="formPesquisa">
+    <h2>Pesquisa de Satisfação</h2>
 
-  <label>Solicitante:</label>
-  <select id="solicitante">
-    <option value="">Selecione o solicitante</option>
-    <option value="ADM">ADM</option>
-    <option value="Ruan">Ruan</option>
-    <option value="Renata">Renata</option>
-    <option value="Lu">Lu</option>
-    <option value="Bruna">Bruna</option>
-    <option value="Renan">Renan</option>
-    <option value="Raimundo">Raimundo</option>
-    <option value="Cleide">Cleide</option>
-    <option value="Ricardo">Ricardo</option>
-    <option value="Larissa">Larissa</option>
-    <option value="Gabriel">Gabriel</option>
-    <option value="Valcir">Valcir</option>
-    <option value="Tailson">Tailson</option>
-    <option value="Dheure">Dheure</option>
-    <option value="Dorilson">Dorilson</option>
-    <option value="joane">joane</option>
-    <option value="Neval">Neval</option>
-    <option value="Agnaldo">Agnaldo</option>
-    <option value="Genison">Jenison</option>
-    <option value="Vanial">Vania</option>
-    <option value="Adriana">Adriana</option>
-    <option value="Ivaneide">Ivaneide</option>
-    <option value="Quiteria">Quiteria</option>
-    <option value="Luziânia">Luziânia</option>
-    <option value="Rosemeire">Rosemeire</option>
-    <option value="Wilma">Wilma</option>
-    <option value="Islane">Islane</option>
-    <option value="Marcelo">Marcelo</option>
-    <option value="Juciara">Juciara</option>
-    <option value="Aline Santos">Aline Santos</option>
-    <option value="Aline Rodrigues">Aline Rodrigues</option>
-    <option value="Geane">Geane</option>
-    <!-- ... MANTÉM TODOS -->
-  </select>
+    <label for="nome">Nome:</label>
+    <input type="text" name="nome" required>
 
-  <label>Setor:</label>
-  <select id="setor">
-    <option value="">Selecione o setor</option>
-    <option value="Cozinha">Cozinha</option>
-    <option value="Limpeza">Limpeza</option>
-    <option value="Sushi">Sushi</option>
-    <option value="Garçons">Garçons</option>
-    <option value="Gerência">Gerência</option>
-    <option value="Pizzaria">Pizzaria</option>
-    <option value="Bar">Bar</option>
-    <option value="Churrasqueira">Churrasqueira</option>
-    <option value="Caixa">Caixa</option>
-    <!-- ... -->
-  </select>
+    <label for="email">Email:</label>
+    <input type="email" name="email">
 
-  <label>Produto:</label>
-  <input type="text" id="item" placeholder="Digite o produto">
+    <label for="satisfacao">Nível de Satisfação:</label>
+    <select name="satisfacao" required>
+      <option value="">Selecione...</option>
+      <option value="Ótimo">Ótimo</option>
+      <option value="Bom">Bom</option>
+      <option value="Regular">Regular</option>
+      <option value="Ruim">Ruim</option>
+    </select>
 
-  <label>Quantidade:</label>
-  <input type="number" id="quantidade" min="1">
+    <label for="comentario">Comentário:</label>
+    <textarea name="comentario" rows="4"></textarea>
 
-  <label>Unidade de Medida:</label>
-  <div class="unidades">
-    <button type="button" onclick="selecionarUnidade(this, 'UN.')">UN.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'PC.')">PC.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'L.')">L.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'KG.')">KG.</button>
-    <button type="button" onclick="selecionarUnidade(this, 'CX')">CX.</button>
-    <!-- ... -->
-  </div>
+    <button type="submit">Enviar</button>
+    <div class="success" id="msgSucesso"></div>
+  </form>
 
-  <label>Observações:</label>
-  <textarea id="observacoes" placeholder="Observações gerais"></textarea>
+  <script>
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxdY3Rb7o_ZngAtFJJqWRpB-IP_Su2v1Is1GZlUNohjvBlNXg4oN4Ixw9jQQeHHt0fJ/exec';
 
-  <div id="spinner"></div>
-  <button id="btn-enviar" class="btn-blue" onclick="enviarItem()">ENVIAR ITEM</button>
-  <button class="btn-red" onclick="limparTabela()">LIMPAR HISTÓRICO</button>
-  <p id="msg"></p>
+    document.getElementById('formPesquisa').addEventListener('submit', e => {
+      e.preventDefault();
 
-  <h3>Itens enviados nesta sessão:</h3>
-  <table id="historico">
-    <tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th><th>Status</th></tr>
-  </table>
-</div>
+      const form = e.target;
+      const data = new FormData(form);
 
-<script>
-const solicitanteSenhas = {
-    "ADM": "00", "Ruan": "Ruan10", "Renata": "Renata12",
-    "Lu": "Lu26", "Bruna": "Bruna48", "Renan": "Renan78",
-    "Raimundo": "Raimundo47", "Cleide": "Cleide98", "Ricardo": "Ricardo41",
-    "Larissa": "Larissa56", "Valcir": "Valcir24", "Tailson": "Tailson97",
-    "Dheure": "Dheure73", "Neval": "Neval34", "Agnaldo": "Agnaldo67",
-    "Genison": "Genison35", "Dorilson": "Dorilson8", "joane": "joane6",
-    "Vanial": "Vanial86", "Adriana": "Adriana49", "Ivaneide": "Ivaneide46",
-    "Geane": "Geane83", "Luziânia": "Luziânia8", "Rosemeire": "Rosemeire30",
-    "Wilma": "Wilma87", "Gabriel": "Gabriel5", "Islane": "Islane78",
-    "Marcelo": "Marcelo75", "Juciara": "Juciara35", "Aline Santos": "Aline32",
-    "Aline Rodrigues": "Aline59", "Quiteria": "Quiteria43"
-};
-
-let unidadeSelecionada = '';
-let enviados = JSON.parse(localStorage.getItem('enviados')) || [];
-let senhaAutenticada = '';
-
-function selecionarUnidade(btn, valor) {
-  unidadeSelecionada = valor;
-  document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
-  btn.classList.add('ativo');
-}
-
-document.getElementById('solicitante').addEventListener('change', () => {
-  const s = document.getElementById('solicitante').value;
-  if (s) {
-    const senha = prompt(`Digite a senha para ${s}:`);
-    if (senha === solicitanteSenhas[s]) {
-      senhaAutenticada = senha;
-      document.getElementById('msg').innerText = "✅ Autenticado!";
-    } else {
-      senhaAutenticada = '';
-      document.getElementById('msg').innerText = "❌ Senha incorreta!";
-      document.getElementById('solicitante').value = '';
-    }
-  }
-});
-
-function enviarItem() {
-  const solicitante = document.getElementById('solicitante').value.trim();
-  const setor = document.getElementById('setor').value.trim();
-  const item = document.getElementById('item').value.trim();
-  const quantidade = document.getElementById('quantidade').value.trim();
-  const observacoes = document.getElementById('observacoes').value.trim();
-  const horaEnvio = new Date().toLocaleTimeString();
-
-  if (!solicitante || !setor || !item || !quantidade || !unidadeSelecionada || !senhaAutenticada) {
-    document.getElementById('msg').innerText = "⚠️ Preencha tudo!";
-    return;
-  }
-
-  document.getElementById('spinner').style.display = 'block';
-  document.getElementById('btn-enviar').disabled = true;
-
-  enviados.push({ item, unidade: unidadeSelecionada, quantidade, setor, hora: horaEnvio, status: "Processando" });
-  save();
-  atualizarTabela();
-
-  const data = new URLSearchParams();
-  data.append('Item', item);
-  data.append('Unidade', unidadeSelecionada);
-  data.append('Quantidade', quantidade);
-  data.append('Setor', setor);
-  data.append('Solicitante', solicitante);
-  data.append('Observacoes', observacoes);
-
-  fetch('https://script.google.com/macros/s/AKfycbxzho14mNBkxfDV5xTk_SmCyNAepae1oXmpJdZNf90fBi_nhokG174ul26COo8QNmGjLw/exec', {
-    method: 'POST',
-    body: data
-  })
-  .then(() => {
-    enviados[enviados.length - 1].status = "Enviado";
-    save();
-    atualizarTabela();
-    alert("✅ Item enviado com sucesso!");
-    limparCampos();
-  })
-  .catch(() => {
-    document.getElementById('msg').innerText = "✅ Item enviado com sucesso!";
-  })
-  .finally(() => {
-    document.getElementById('spinner').style.display = 'none';
-    document.getElementById('btn-enviar').disabled = false;
-  });
-}
-
-function limparCampos() {
-  document.getElementById('item').value = '';
-  document.getElementById('quantidade').value = '';
-  document.getElementById('observacoes').value = '';
-  unidadeSelecionada = '';
-  document.querySelectorAll('.unidades button').forEach(b => b.classList.remove('ativo'));
-}
-
-function atualizarTabela() {
-  const tabela = document.getElementById('historico');
-  tabela.innerHTML = `<tr><th>Produto</th><th>Unidade</th><th>Qtd</th><th>Setor</th><th>Hora</th><th>Status</th></tr>`;
-  enviados.forEach(i => {
-    const row = tabela.insertRow();
-    row.insertCell(0).innerText = i.item;
-    row.insertCell(1).innerText = i.unidade;
-    row.insertCell(2).innerText = i.quantidade;
-    row.insertCell(3).innerText = i.setor;
-    row.insertCell(4).innerText = i.hora;
-    row.insertCell(5).innerText = i.status;
-  });
-}
-
-function save() {
-  localStorage.setItem('enviados', JSON.stringify(enviados));
-}
-
-function limparTabela() {
-  enviados = [];
-  save();
-  atualizarTabela();
-}
-
-function atualizarStatusPlanilha() {
-  fetch('https://script.google.com/macros/s/AKfycby_qZFsDNjx63LWTkJrV9DID2ZeJcByUrun9M3KHEbLUW0HO8asGnTklREen8uBYUAWtQ/exec')
-    .then(r => r.json())
-    .then(data => {
-      enviados.forEach(localItem => {
-        const encontrado = data.find(r => r.Item === localItem.item);
-        if (encontrado) localItem.status = encontrado.Status || localItem.status;
+      fetch(scriptURL, {
+        method: 'POST',
+        body: data
+      })
+      .then(response => {
+        document.getElementById('msgSucesso').textContent = "Resposta registrada com sucesso!";
+        form.reset();
+      })
+      .catch(error => {
+        alert("Erro ao enviar: " + error.message);
       });
-      save();
-      atualizarTabela();
     });
-}
-
-setInterval(atualizarStatusPlanilha, 10000);
-atualizarTabela();
-</script>
-
+  </script>
 </body>
 </html>
