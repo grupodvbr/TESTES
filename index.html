@@ -434,10 +434,16 @@
   const hora = new Date(r.datahora).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const status = r.status||'Pendente';
 
-  // capturar anexos: todos os campos que sejam links (http/https)
+  // anexos em colunas diferentes
   const anexos = Object.keys(r)
-    .filter(k => typeof r[k] === "string" && r[k].startsWith("http"))
+    .filter(k => k.toLowerCase().includes("anexo") && r[k])
     .map((k,i) => `<a href="${r[k]}" target="_blank">📎 Anexo ${i+1}</a>`)
+    .join("<br>");
+
+  // pagamentos adicionais
+  const pagamentos = Object.keys(r)
+    .filter(k => k.toLowerCase().includes("pagamento") && r[k])
+    .map((k,i) => `💵 Pagamento ${i+1}: ${formatBRL(parseBRL(r[k]))}`)
     .join("<br>");
 
   return `<div class="res-item" data-id="${r.id}">
@@ -456,14 +462,12 @@
     <div class="meta"><b>Email:</b> ${r.email||'—'} • <b>Tel:</b> ${r.telefone||'—'}</div>
     <div class="meta"><b>Cardápio:</b> ${r.cardapio||'—'} • <b>Banco:</b> ${r.banco||'—'}</div>
     <div class="meta"><b>Obs:</b> ${r.observacoes||'—'}</div>
-    <div class="meta">
-      Estimado: ${formatBRL(parseBRL(r.valorEstimado||0))} • 
-      Adiantamento: ${formatBRL(parseBRL(r.pagamentoAntecipado||0))} • 
-      Final pago: ${formatBRL(parseBRL(r.valorFinalPago||0))}
-    </div>
-    ${anexos ? `<div class="meta">${anexos}</div>` : ""}
+    <div class="meta">Estimado: ${formatBRL(parseBRL(r.valorEstimado||0))} • Adiantamento: ${formatBRL(parseBRL(r.pagamentoAntecipado||0))} • Final pago: ${formatBRL(parseBRL(r.valorFinalPago||0))}</div>
+    ${pagamentos? `<div class="meta">${pagamentos}</div>`:""}
+    ${anexos? `<div class="meta">${anexos}</div>`:""}
   </div>`;
 }
+
 
     // ===== Form & validações =====
     const form = $('#reservaForm');
