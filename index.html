@@ -164,7 +164,7 @@
               <input id="valorEstimado" name="valorEstimado" type="text" inputmode="decimal" placeholder="0,00" />
             </div>
             <div>
-              <label for="pagamentoAntecipado">Pagamento Antecipado (R$)</label>
+              <label for="pagamentoAntecipado">Antecipação (R$)</label>
               <input id="pagamentoAntecipado" name="pagamentoAntecipado" type="text" inputmode="decimal" placeholder="0,00" />
             </div>
             <div>
@@ -295,7 +295,7 @@
     // ===== Helpers =====
     const $ = (s,el=document)=>el.querySelector(s);
     const $$ = (s,el=document)=>Array.from(el.querySelectorAll(s));
-    const toast = (msg, ms=3000) => { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"), ms); };
+    const toast = (msg, ms=3500) => { const el = $("#toast"); el.textContent = msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"), ms); };
     const maskPhone = v => { const d = v.replace(/\D/g,'').slice(0,11); return d.length<=10? d.replace(/^(\d{2})(\d{4})(\d{0,4}).*/,"($1) $2-$3") : d.replace(/^(\d{2})(\d{5})(\d{0,4}).*/,"($1) $2-$3"); };
     const formatBRL = (num) => Number(num||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
     const formatBRLInput = v => { const only=v.replace(/[^\d]/g,''); const n=Number(only)/100; return isNaN(n)?"": n.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2}); };
@@ -304,36 +304,26 @@
     const ymd = d=>{ const z=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`; };
 
     // ===== Estado =====
-    const state = { mes:(new Date()).getMonth(), ano:(new Date()).getFullYear(), reservas:[], editingId:null, finishTarget:null };
+    const state = { mes:(new Date()).getMonth(), ano:(new Date()).getFullYear(), reservas:[], editingId:null };
 
-    // ===== API (com fallback localStorage) =====
-    const LS_KEY = 'reservas_offline';
+    // ===== API (SEM localStorage) =====
     const api = {
       async listar(ano, mes){
-        try{
-          const url = `${endpoint}?acao=listar&ano=${ano}&mes=${mes+1}`; // espera 1-12
-          const res = await fetch(url, {method:'GET'});
-          const data = await res.json();
-          if(Array.isArray(data)) return data;
-          throw new Error('Formato inesperado');
-        }catch(e){
-          console.warn('Listar via endpoint falhou, usando fallback localStorage.', e);
-          const raw = localStorage.getItem(LS_KEY);
-          return raw? JSON.parse(raw) : [];
-        }
+        const url = `${endpoint}?acao=listar&ano=${ano}&mes=${mes+1}`; // espera 1-12
+        const res = await fetch(url, {method:'GET'});
+        if(!res.ok) throw new Error(`Erro ${res.status}`);
+        const data = await res.json();
+        if(!Array.isArray(data)) throw new Error('Resposta inválida da API.');
+        return data;
       },
       async cadastrar(payload){
         try{
           const res = await fetch(endpoint, { method:'POST', body:new URLSearchParams(payload) });
           const txt = await res.text();
-          return { ok:true, message: txt||'OK' };
+          if(!res.ok) return { ok:false, message: txt || 'Falha ao salvar na planilha.' };
+          return { ok:true, message: txt || 'OK' };
         }catch(e){
-          // fallback: salva localmente para não perder
-          const arr = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
-          const id = 'OFF-' + (Date.now());
-          arr.push({ ...payload, id });
-          localStorage.setItem(LS_KEY, JSON.stringify(arr));
-          return { ok:false, message:'Salvo localmente (offline).', id };
+          return { ok:false, message:`Erro ao salvar na planilha: ${e.message}` };
         }
       },
       async atualizar(id, payload){
@@ -341,13 +331,10 @@
           const body = new URLSearchParams({ acao:'atualizar', id, ...payload });
           const res = await fetch(endpoint, { method:'POST', body });
           const txt = await res.text();
-          return { ok:true, message: txt||'Atualizado' };
+          if(!res.ok) return { ok:false, message: txt || 'Falha ao atualizar na planilha.' };
+          return { ok:true, message: txt || 'Atualizado' };
         }catch(e){
-          // fallback LS
-          const arr = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
-          const i = arr.findIndex(r=>r.id==id);
-          if(i>=0){ arr[i] = { ...arr[i], ...payload }; localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
-          return { ok:false, message:'Atualizado localmente (offline).' };
+          return { ok:false, message:`Erro ao atualizar: ${e.message}` };
         }
       },
       async concluir(id, valorFinalPago){
@@ -355,12 +342,10 @@
           const body = new URLSearchParams({ acao:'concluir', id, valorFinalPago:String(valorFinalPago), status:'Concluída' });
           const res = await fetch(endpoint, { method:'POST', body });
           const txt = await res.text();
-          return { ok:true, message: txt||'Concluída' };
+          if(!res.ok) return { ok:false, message: txt || 'Falha ao concluir na planilha.' };
+          return { ok:true, message: txt || 'Concluída' };
         }catch(e){
-          const arr = JSON.parse(localStorage.getItem(LS_KEY)||'[]');
-          const i = arr.findIndex(r=>r.id==id);
-          if(i>=0){ arr[i].valorFinalPago = String(valorFinalPago); arr[i].status='Concluída'; localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
-          return { ok:false, message:'Concluída localmente (offline).' };
+          return { ok:false, message:`Erro ao concluir: ${e.message}` };
         }
       }
     };
@@ -426,7 +411,6 @@
       if(!items || !items.length){ list.innerHTML = '<div class="hint">Nenhuma reserva neste dia.</div>'; }
       else{
         list.innerHTML = items.map(r=> renderResItem(r)).join('');
-        // bind actions
         $$('#dayModal .btn-concluir').forEach(btn=> btn.addEventListener('click', onClickConcluir));
         $$('#dayModal .btn-editar').forEach(btn=> btn.addEventListener('click', onClickEditar));
       }
@@ -513,10 +497,15 @@
       if(state.editingId){ resp = await api.atualizar(state.editingId, payload); }
       else{ resp = await api.cadastrar(payload); }
 
-      toast((resp.ok? '✅ ': '⚠️ ') + (resp.message||'OK'));
-      // Reload
-      await loadMonth(state.ano, state.mes);
-      form.reset(); statusChip.textContent='Pendente'; inputData.min = nowLocalMin(); fileBox.style.display='none'; cancelEditBtn.style.display='none'; state.editingId=null; $('#reservaId').value='';
+      if(resp.ok){
+        toast('✅ ' + (resp.message||'OK'));
+        await loadMonth(state.ano, state.mes);
+        form.reset(); statusChip.textContent='Pendente'; inputData.min = nowLocalMin(); 
+        fileBox.style.display='none'; cancelEditBtn.style.display='none'; state.editingId=null; $('#reservaId').value='';
+      }else{
+        toast('⚠️ ' + resp.message);
+      }
+
       spinner.classList.remove('show'); submitBtn.disabled = false;
     });
 
@@ -536,18 +525,17 @@
       state.editingId = id; $('#reservaId').value = id;
       form.scrollIntoView({behavior:'smooth', block:'start'});
       $('#nome').value = r.nome||''; $('#email').value=r.email||''; $('#telefone').value=r.telefone||''; $('#pessoas').value=r.pessoas||''; $('#mesa').value=r.mesa||''; $('#cardapio').value=r.cardapio||''; $('#observacoes').value=r.observacoes||'';
-      $('#valorEstimado').value = formatBRLInput(String(parseBRL(r.valorEstimado||0)*100)); // trick to reuse mask
       $('#valorEstimado').value = formatBRL(parseBRL(r.valorEstimado||0)).replace('R$ ','');
       $('#pagamentoAntecipado').value = formatBRL(parseBRL(r.pagamentoAntecipado||0)).replace('R$ ','');
       $('#banco').value = r.banco||''; toggleBancoRequired();
       const dt = new Date(r.datahora); const off = new Date(dt); off.setMinutes(dt.getMinutes()-dt.getTimezoneOffset()); $('#datahora').value = off.toISOString().slice(0,16);
       statusChip.textContent = r.status||'Pendente';
       cancelEditBtn.style.display='inline-block';
-      dayModal.classList.remove('show');
+      $('#dayModal').classList.remove('show');
     }
 
     cancelEditBtn.addEventListener('click', ()=>{
-      state.editingId=null; $('#reservaId').value=''; form.reset(); statusChip.textContent='Pendente'; cancelEditBtn.style.display='none'; fileBox.style.display='none'; inputData.min = nowLocalMin();
+      state.editingId=null; $('#reservaId').value=''; form.reset(); statusChip.textContent='Pendente'; cancelEditBtn.style.display='none'; $('#fileBox').style.display='none'; $('#datahora').min = nowLocalMin();
     });
 
     // Concluir fluxo com modal
@@ -570,9 +558,13 @@
       if(!(v>0)){ toast('Informe um valor válido.'); finalPagoInput.focus(); return; }
       if(!finishId) return;
       const resp = await api.concluir(finishId, v);
-      toast((resp.ok? '✅ ':'⚠️ ') + (resp.message||'Concluída'));
-      finishModal.classList.remove('show'); finishId=null;
-      await loadMonth(state.ano, state.mes);
+      if(resp.ok){
+        toast('✅ ' + (resp.message||'Concluída'));
+        finishModal.classList.remove('show'); finishId=null;
+        await loadMonth(state.ano, state.mes);
+      }else{
+        toast('⚠️ ' + resp.message);
+      }
     });
 
     // ===== Navegação mês =====
@@ -582,18 +574,22 @@
     $('#refreshBtn').addEventListener('click', ()=> refreshAll());
 
     async function loadMonth(ano, mes){
-      state.reservas = await api.listar(ano, mes);
-      // normalizar campos numéricos e garantir ID
-      state.reservas = state.reservas.map((r,i)=> ({
-        id: r.id || r.ID || `ROW-${i+1}`,
-        nome: r.nome||r.Nome||'', email:r.email||r.Email||'', telefone:r.telefone||r.Fone||'', pessoas:r.pessoas||r.Pessoas||'',
-        mesa:r.mesa||r.Local||'', cardapio:r.cardapio||r.Cardapio||'', observacoes:r.observacoes||r.Obs||'',
-        datahora: r.datahora || r.DataHora || r.data || r.Data || '',
-        valorEstimado: String(r.valorEstimado ?? r.ValorEstimado ?? '0'),
-        pagamentoAntecipado: String(r.pagamentoAntecipado ?? r.Adiantamento ?? '0'),
-        valorFinalPago: String(r.valorFinalPago ?? r.FinalPago ?? '0'),
-        banco: r.banco || r.Banco || '', status: r.status || r.Status || 'Pendente'
-      }));
+      try{
+        const data = await api.listar(ano, mes);
+        state.reservas = data.map((r,i)=> ({
+          id: r.id || r.ID || `ROW-${i+1}`,
+          nome: r.nome||r.Nome||'', email:r.email||r.Email||'', telefone:r.telefone||r.Fone||'', pessoas:r.pessoas||r.Pessoas||'',
+          mesa:r.mesa||r.Local||'', cardapio:r.cardapio||r.Cardapio||'', observacoes:r.observacoes||r.Obs||'',
+          datahora: r.datahora || r.DataHora || r.data || r.Data || '',
+          valorEstimado: String(r.valorEstimado ?? r.ValorEstimado ?? '0'),
+          pagamentoAntecipado: String(r.pagamentoAntecipado ?? r.Adiantamento ?? '0'),
+          valorFinalPago: String(r.valorFinalPago ?? r.FinalPago ?? '0'),
+          banco: r.banco || r.Banco || '', status: r.status || r.Status || 'Pendente'
+        }));
+      }catch(e){
+        state.reservas = [];
+        toast('⚠️ Erro ao carregar dados da planilha: ' + e.message);
+      }
       buildCalendar(); updateSummary();
     }
 
@@ -601,6 +597,7 @@
 
     // ===== Inicialização =====
     window.addEventListener('DOMContentLoaded', ()=>{
+      $('#datahora').min = nowLocalMin();
       refreshAll();
     });
   </script>
