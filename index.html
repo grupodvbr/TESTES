@@ -290,7 +290,7 @@
 
   <script>
     // ===== Config =====
-    const endpoint = "https://script.google.com/macros/s/AKfycbz3GuQe4P9WsiacfvpiG_V7tFCWeNf9dqKueu3ArErzL8L3ETY34QI1v_IaNu9YJkQG/exec";
+    const endpoint = "https://script.google.com/macros/s/AKfycbw95-FIWaeAYutU_YHwJ8r8he2blb3Xf2624rNR8cY-hVAXi-90HQ2x6tnEeFWGouU8/exec";
 
     // ===== Helpers =====
     const $ = (s,el=document)=>el.querySelector(s);
@@ -309,7 +309,7 @@
     // ===== API (SEM localStorage) =====
     const api = {
       async listar(ano, mes){
-        const url = `${endpoint}?acao=listar&ano=${ano}&mes=${mes+1}`; // espera 1-12
+        const url = `${endpoint}?acao=listar&ano=${ano}&mes=${mes+1}`;
         const res = await fetch(url, {method:'GET'});
         if(!res.ok) throw new Error(`Erro ${res.status}`);
         const data = await res.json();
@@ -329,7 +329,7 @@
       async atualizar(id, payload){
         try{
           const body = new URLSearchParams({ acao:'atualizar', id, ...payload });
-          const res = await fetch(endpoint, { method:'POST', body });
+        const res = await fetch(endpoint, { method:'POST', body });
           const txt = await res.text();
           if(!res.ok) return { ok:false, message: txt || 'Falha ao atualizar na planilha.' };
           return { ok:true, message: txt || 'Atualizado' };
@@ -373,7 +373,7 @@
       calGrid.innerHTML = '';
       const first = new Date(ano, mes, 1);
       const start = new Date(first);
-      const startDay = (first.getDay()+7)%7; // 0 dom
+      const startDay = (first.getDay()+7)%7;
       start.setDate(1 - startDay);
       for(let i=0;i<42;i++){
         const d = new Date(start); d.setDate(start.getDate()+i);
@@ -459,7 +459,7 @@
 
     const inputTelefone = $('#telefone');
     const inputValor = $('#valorEstimado');
-    const inputSinal = $('#pagamentoAntecipado`);
+    const inputSinal = $('#pagamentoAntecipado');
     const selectBanco = $('#banco');
     const bancoReq = $('#bancoReq');
     const inputArquivo = $('#arquivo');
@@ -513,7 +513,7 @@
       if(resp.ok){
         toast('✅ ' + (resp.message||'OK'));
         await loadMonth(state.ano, state.mes);
-        form.reset(); statusChip.textContent='Pendente'; inputData.min = nowLocalMin(); 
+        form.reset(); statusChip.textContent='Pendente'; inputData.min = nowLocalMin();
         fileBox.style.display='none'; cancelEditBtn.style.display='none'; state.editingId=null; $('#reservaId').value='';
       }else{
         toast('⚠️ ' + resp.message);
@@ -603,7 +603,7 @@
         state.reservas = data.map((r,i)=> ({
           id: r.id || r.ID || `ROW-${i+1}`,
           nome: r.nome||r.Nome||'', email:r.email||r.Email||'', telefone:r.telefone||r.Fone||'', pessoas:r.pessoas||r.Pessoas||'',
-          mesa: r.mesa||r.Local||'', cardapio:r.cardapio||r.Cardapio||'', observacoes:r.observacoes||r.Obs||'',
+          mesa:r.mesa||r.Local||'', cardapio:r.cardapio||r.Cardapio||'', observacoes:r.observacoes||r.Obs||'',
           datahora: r.datahora || r.DataHora || r.data || r.Data || '',
           valorEstimado: String(r.valorEstimado ?? r.ValorEstimado ?? '0'),
           pagamentoAntecipado: String(r.pagamentoAntecipado ?? r.Adiantamento ?? '0'),
