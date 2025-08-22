@@ -290,7 +290,7 @@
 
   <script>
     // ===== Config =====
-    const endpoint = "https://script.google.com/macros/s/AKfycbw95-FIWaeAYutU_YHwJ8r8he2blb3Xf2624rNR8cY-hVAXi-90HQ2x6tnEeFWGouU8/exec";
+    const endpoint = "https://script.google.com/macros/s/AKfycbz3GuQe4P9WsiacfvpiG_V7tFCWeNf9dqKueu3ArErzL8L3ETY34QI1v_IaNu9YJkQG/exec";
 
     // ===== Helpers =====
     const $ = (s,el=document)=>el.querySelector(s);
@@ -346,6 +346,17 @@
           return { ok:true, message: txt || 'Concluída' };
         }catch(e){
           return { ok:false, message:`Erro ao concluir: ${e.message}` };
+        }
+      },
+      async excluir(id){
+        try{
+          const body = new URLSearchParams({ acao:'excluir', id });
+          const res = await fetch(endpoint, { method:'POST', body });
+          const txt = await res.text();
+          if(!res.ok) return { ok:false, message: txt || 'Falha ao excluir na planilha.' };
+          return { ok:true, message: txt || 'Excluída' };
+        }catch(e){
+          return { ok:false, message:`Erro ao excluir: ${e.message}` };
         }
       }
     };
@@ -413,6 +424,7 @@
         list.innerHTML = items.map(r=> renderResItem(r)).join('');
         $$('#dayModal .btn-concluir').forEach(btn=> btn.addEventListener('click', onClickConcluir));
         $$('#dayModal .btn-editar').forEach(btn=> btn.addEventListener('click', onClickEditar));
+        $$('#dayModal .btn-excluir').forEach(btn=> btn.addEventListener('click', onClickExcluir));
       }
       dayModal.classList.add('show');
     }
@@ -430,6 +442,7 @@
           <div class="row" style="margin-left:auto">
             <span class="chip">${status}</span>
             <button class="btn btn-ghost btn-editar" data-id="${r.id}" style="width:auto">Editar</button>
+            <button class="btn btn-danger btn-excluir" data-id="${r.id}" style="width:auto">Excluir</button>
             <button class="btn btn-primary btn-concluir" data-id="${r.id}" style="width:auto">Concluir</button>
           </div>
         </div>
@@ -446,7 +459,7 @@
 
     const inputTelefone = $('#telefone');
     const inputValor = $('#valorEstimado');
-    const inputSinal = $('#pagamentoAntecipado');
+    const inputSinal = $('#pagamentoAntecipado`);
     const selectBanco = $('#banco');
     const bancoReq = $('#bancoReq');
     const inputArquivo = $('#arquivo');
@@ -517,7 +530,7 @@
       return obj;
     }
 
-    // ===== Ações: Editar & Concluir =====
+    // ===== Ações: Editar / Concluir / Excluir =====
     function onClickEditar(e){
       const id = e.currentTarget.dataset.id;
       const r = state.reservas.find(x=>String(x.id)===String(id));
@@ -534,9 +547,20 @@
       $('#dayModal').classList.remove('show');
     }
 
-    cancelEditBtn.addEventListener('click', ()=>{
-      state.editingId=null; $('#reservaId').value=''; form.reset(); statusChip.textContent='Pendente'; cancelEditBtn.style.display='none'; $('#fileBox').style.display='none'; $('#datahora').min = nowLocalMin();
-    });
+    async function onClickExcluir(e){
+      const id = e.currentTarget.dataset.id;
+      const r = state.reservas.find(x=>String(x.id)===String(id));
+      if(!r) return;
+      const ok = confirm(`Excluir a reserva de ${r.nome||'—'} em ${new Date(r.datahora).toLocaleString('pt-BR')}? Esta ação não pode ser desfeita.`);
+      if(!ok) return;
+      const resp = await api.excluir(id);
+      if(resp.ok){
+        toast('🗑️ Reserva excluída');
+        await loadMonth(state.ano, state.mes);
+      }else{
+        toast('⚠️ ' + resp.message);
+      }
+    }
 
     // Concluir fluxo com modal
     const finishModal = $('#finishModal');
@@ -579,7 +603,7 @@
         state.reservas = data.map((r,i)=> ({
           id: r.id || r.ID || `ROW-${i+1}`,
           nome: r.nome||r.Nome||'', email:r.email||r.Email||'', telefone:r.telefone||r.Fone||'', pessoas:r.pessoas||r.Pessoas||'',
-          mesa:r.mesa||r.Local||'', cardapio:r.cardapio||r.Cardapio||'', observacoes:r.observacoes||r.Obs||'',
+          mesa: r.mesa||r.Local||'', cardapio:r.cardapio||r.Cardapio||'', observacoes:r.observacoes||r.Obs||'',
           datahora: r.datahora || r.DataHora || r.data || r.Data || '',
           valorEstimado: String(r.valorEstimado ?? r.ValorEstimado ?? '0'),
           pagamentoAntecipado: String(r.pagamentoAntecipado ?? r.Adiantamento ?? '0'),
