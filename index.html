@@ -4,43 +4,92 @@
 <meta charset="UTF-8">
 <title>Reservas de Aniversários • Mercatto Delícia</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light dark">
 
 <!-- FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
 <style>
-  :root{
-    --bg:#0b0e13;--card:#12161d;--ink:#f5f7fb;--muted:#9aa0ad;
-    --green:#16a34a;--red:#dc2626;--blue:#2563eb;
+  :root {
+    /* Tema claro */
+    --bg:#fafafa;--card:#ffffff;--ink:#1e293b;--muted:#64748b;
+    --green:#16a34a;--red:#dc2626;--blue:#2563eb;--yellow:#facc15;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0b0e13;--card:#12161d;--ink:#f5f7fb;--muted:#9aa0ad;
+      --green:#16a34a;--red:#ef4444;--blue:#3b82f6;--yellow:#eab308;
+    }
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,Arial;background:var(--bg);color:var(--ink)}
-  header{
-    text-align:center;padding:16px;font-size:22px;font-weight:700;
-    background:#11151d;box-shadow:0 2px 6px rgba(0,0,0,.3);
+  body{
+    margin:0;
+    font-family:system-ui,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    transition:background .3s,color .3s;
   }
-  #calendar{max-width:1200px;margin:20px auto;padding:10px;background:var(--card);border-radius:12px}
-  .fc-toolbar-title{color:var(--ink)}
+  header{
+    text-align:center;
+    padding:16px;
+    font-size:22px;
+    font-weight:700;
+    background:var(--blue);
+    color:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+  }
+  #calendar{
+    max-width:1200px;
+    margin:20px auto;
+    padding:10px;
+    background:var(--card);
+    border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.1);
+  }
+  .fc-toolbar-title{color:var(--ink)!important}
+  .fc-button-primary{
+    background:var(--blue)!important;
+    border:none!important;
+  }
+
+  /* Modal */
   .modal{
-    position:fixed;inset:0;background:rgba(0,0,0,.7);
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.6);
     display:none;align-items:center;justify-content:center;
+    backdrop-filter:blur(3px);
   }
   .modal.show{display:flex}
   .card{
-    background:var(--card);color:var(--ink);padding:20px;border-radius:12px;max-width:460px;width:90%;
+    background:var(--card);
+    color:var(--ink);
+    padding:24px;
+    border-radius:14px;
+    max-width:460px;
+    width:90%;
+    box-shadow:0 6px 20px rgba(0,0,0,.25);
+    animation:pop .25s ease;
   }
-  .card h2{margin-top:0;text-align:center}
-  .row{margin:8px 0}
-  .btns{display:flex;justify-content:space-between;margin-top:18px}
+  @keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .card h2{margin-top:0;text-align:center;font-size:20px}
+  .row{margin:6px 0;font-size:15px}
+  .btns{display:flex;justify-content:space-between;margin-top:20px;gap:8px}
   button{
-    flex:1;margin:0 4px;padding:12px;border:none;border-radius:8px;
-    font-weight:700;cursor:pointer;color:#fff;
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    font-weight:700;
+    cursor:pointer;
+    color:#fff;
+    transition:filter .2s,transform .1s;
   }
+  button:active{transform:scale(.97)}
   .accept{background:var(--green)}
   .finish{background:var(--blue)}
   .close{background:var(--red)}
+  button:hover{filter:brightness(1.08)}
 </style>
 </head>
 <body>
@@ -66,28 +115,39 @@ const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxLXYQnMVCIRCJUv0K
 let reservas = [];
 let reservaAtual = null;
 
+// 🧭 Carregar reservas do Google Sheets
 async function carregarReservas(){
-  const res = await fetch(GAS_ENDPOINT + "?acao=listar");
-  reservas = await res.json();
+  try{
+    const res = await fetch(GAS_ENDPOINT + "?acao=listar");
+    reservas = await res.json();
 
-  const eventos = reservas.map(r => ({
-    title: r.Nome,
-    start: r["Data/Hora"],
-    backgroundColor: r.Status === "Aceita" ? "#16a34a" : "#facc15",
-    borderColor: "#000",
-    extendedProps: r
-  }));
+    const eventos = reservas.map(r => ({
+      title: r.Nome || "(sem nome)",
+      start: r["Data/Hora"] || null,
+      backgroundColor:
+        r.Status?.toLowerCase() === "aceita" ? "#16a34a" :
+        r.Status?.toLowerCase() === "finalizada" ? "#2563eb" : "#facc15",
+      borderColor:"#000",
+      textColor:"#000",
+      extendedProps:r
+    })).filter(ev => ev.start);
 
-  const calendarEl = document.getElementById("calendar");
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    locale: "pt-br",
-    events: eventos,
-    eventClick: (info) => abrirModal(info.event.extendedProps)
-  });
-  calendar.render();
+    const calendarEl = document.getElementById("calendar");
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView:"dayGridMonth",
+      locale:"pt-br",
+      height:"auto",
+      events:eventos,
+      eventClick:(info)=>abrirModal(info.event.extendedProps)
+    });
+    calendar.render();
+  }catch(err){
+    console.error(err);
+    alert("Erro ao carregar reservas. Verifique o endpoint do GAS.");
+  }
 }
 
+// 🪟 Abrir modal de detalhes
 function abrirModal(reserva){
   reservaAtual = reserva;
   const d = document.getElementById("detalhes");
@@ -103,48 +163,49 @@ function abrirModal(reserva){
   document.getElementById("modal").classList.add("show");
 }
 
-document.getElementById("btnFechar").onclick = () => {
+// ❌ Fechar modal
+document.getElementById("btnFechar").onclick = ()=>{
   document.getElementById("modal").classList.remove("show");
   reservaAtual = null;
 };
 
 // ✅ Aceitar reserva → e-mail de confirmação
-document.getElementById("btnAceitar").onclick = async () => {
+document.getElementById("btnAceitar").onclick = async ()=>{
   if(!reservaAtual) return;
   await fetch(GAS_ENDPOINT, {
-    method: "POST",
-    body: new URLSearchParams({
-      acao: "atualizarStatus",
-      status: "Aceita",
-      email: reservaAtual["E-mail"],
-      nome: reservaAtual.Nome,
-      telefone: reservaAtual.Telefone,
-      pessoas: reservaAtual.Pessoas,
-      datahora: reservaAtual["Data/Hora"],
-      observacoes: reservaAtual.Observações || ""
+    method:"POST",
+    body:new URLSearchParams({
+      acao:"atualizarStatus",
+      status:"Aceita",
+      email:reservaAtual["E-mail"],
+      nome:reservaAtual.Nome,
+      telefone:reservaAtual.Telefone,
+      pessoas:reservaAtual.Pessoas,
+      datahora:reservaAtual["Data/Hora"],
+      observacoes:reservaAtual.Observações || ""
     })
   });
   alert("✅ Reserva aceita e e-mail de confirmação enviado!");
-  document.location.reload();
+  location.reload();
 };
 
-// ✅ Finalizar reserva → e-mail de agradecimento
-document.getElementById("btnFinalizar").onclick = async () => {
+// 🎉 Finalizar reserva → e-mail de agradecimento
+document.getElementById("btnFinalizar").onclick = async ()=>{
   if(!reservaAtual) return;
   await fetch(GAS_ENDPOINT, {
-    method: "POST",
-    body: new URLSearchParams({
-      acao: "finalizarReserva",
-      status: "Finalizada",
-      email: reservaAtual["E-mail"],
-      nome: reservaAtual.Nome
+    method:"POST",
+    body:new URLSearchParams({
+      acao:"finalizarReserva",
+      status:"Finalizada",
+      email:reservaAtual["E-mail"],
+      nome:reservaAtual.Nome
     })
   });
-  alert("🎉 E-mail de agradecimento enviado ao cliente!");
-  document.location.reload();
+  alert("💚 E-mail de agradecimento enviado ao cliente!");
+  location.reload();
 };
 
-carregarReservas();
+document.addEventListener("DOMContentLoaded", carregarReservas);
 </script>
 </body>
 </html>
