@@ -70,6 +70,27 @@
     font-size: 12px;
     margin-right: 5px;
   }
+  .totais {
+    background: #fff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .totais h2 {
+    margin-top: 0;
+    color: #333;
+  }
+  .caixa-total {
+    margin-bottom: 5px;
+    font-size: 15px;
+  }
+  .total-geral {
+    font-weight: bold;
+    color: #007bff;
+    font-size: 16px;
+    margin-top: 10px;
+  }
 </style>
 </head>
 <body>
@@ -77,13 +98,16 @@
     <h1>📊 Cupons - Detalhamento de Vendas</h1>
     <a href="#" class="btn" onclick="carregar()">🔄 Atualizar Dados</a>
 
+    <div id="totais"></div>
     <div id="dados"></div>
   </div>
 
 <script>
 async function carregar() {
   const div = document.getElementById('dados');
+  const divTotais = document.getElementById('totais');
   div.innerHTML = "<p>⏳ Carregando dados...</p>";
+  divTotais.innerHTML = "";
 
   try {
     // 🔹 Substitua pela URL do seu Apps Script publicado como Web App (que retorna JSON)
@@ -97,6 +121,8 @@ async function carregar() {
     }
 
     let html = "";
+    const totaisPorCaixa = {};
+    let totalGeral = 0;
 
     data.forEach((linha, i) => {
       const raw = linha.RawJSON;
@@ -104,17 +130,21 @@ async function carregar() {
 
       try {
         const j = JSON.parse(raw);
+        const valor = j.valor ? Number(j.valor) : 0;
+        totalGeral += valor;
+        const caixa = j.numeroCaixa || "Sem Caixa";
+        totaisPorCaixa[caixa] = (totaisPorCaixa[caixa] || 0) + valor;
 
         html += `
         <details>
-          <summary>🧾 <b>${linha.CupomId}</b> — ${linha.Empresa || 'Sem empresa'} | Valor: <b>R$ ${j.valor?.toFixed(2)}</b></summary>
+          <summary>🧾 <b>${linha.CupomId}</b> — ${linha.Empresa || 'Sem empresa'} | Caixa ${caixa} | Valor: <b>R$ ${valor.toFixed(2)}</b></summary>
           <table>
             <tr><th>Campo</th><th>Valor</th></tr>
             <tr><td><b>Data</b></td><td>${j.data}</td></tr>
-            <tr><td><b>Caixa</b></td><td>${j.numeroCaixa}</td></tr>
+            <tr><td><b>Caixa</b></td><td>${caixa}</td></tr>
             <tr><td><b>COO</b></td><td>${j.coo}</td></tr>
             <tr><td><b>Funcionário</b></td><td>${j.funcionarioId}</td></tr>
-            <tr><td><b>Valor Total</b></td><td>R$ ${j.valor.toFixed(2)}</td></tr>
+            <tr><td><b>Valor Total</b></td><td>R$ ${valor.toFixed(2)}</td></tr>
             <tr><td><b>Itens</b></td><td>${j.qtdItensCupom}</td></tr>
             <tr><td><b>Status Nota</b></td><td>${j.statusXMLNota}</td></tr>
           </table>
@@ -152,6 +182,14 @@ async function carregar() {
       }
     });
 
+    // 🔹 montar o resumo de totais
+    let totaisHtml = `<div class="totais"><h2>💰 Totais por Caixa</h2>`;
+    for (const [caixa, valor] of Object.entries(totaisPorCaixa)) {
+      totaisHtml += `<div class="caixa-total">🖥️ Caixa <b>${caixa}</b>: R$ ${valor.toFixed(2)}</div>`;
+    }
+    totaisHtml += `<div class="total-geral">🔷 Total Geral: <b>R$ ${totalGeral.toFixed(2)}</b></div></div>`;
+
+    divTotais.innerHTML = totaisHtml;
     div.innerHTML = html || "<p>Nenhum cupom encontrado.</p>";
   } catch (err) {
     div.innerHTML = `<p>❌ Erro ao carregar: ${err.message}</p>`;
